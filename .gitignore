@@ -1,0 +1,29 @@
+# Байт-код и кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Виртуальные окружения
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Конфигурации и кэш IDE (VS Code, JetBrains)
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Отчёты тестирования и покрытия кода
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Служебные файлы операционной системы
+.DS_Store
+Thumbs.db
+desktop.ini
