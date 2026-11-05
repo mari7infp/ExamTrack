@@ -9,7 +9,7 @@ def create_tables_and_seed():
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     
-    # Создаем пустые таблицы
+    
     cur.executescript("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,23 +79,47 @@ def create_tables_and_seed():
         );
     """)
     
-    # Проверяем, есть ли уже пользователи. Если нет — добавляем.
+   
     cur.execute("SELECT COUNT(*) FROM users")
     if cur.fetchone()[0] == 0:
         password_hash = hashlib.sha256('12345'.encode('utf-8')).hexdigest()
         
-        # администратор и преподавателя
+        # администратор и преподаватель
         cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('admin', ?, 'Администратор')", (password_hash,))
         cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('teacher', ?, 'Преподаватель')", (password_hash,))
         teacher_id = cur.lastrowid
-        cur.execute("INSERT INTO teachers (user_id, full_name, department) VALUES (?, 'Иванов И.И.', 'Кафедра ИТ')", (teacher_id,))
+        cur.execute("INSERT INTO teachers (user_id, full_name, department) VALUES (?, 'Иванов И.А.', 'Кафедра ИТ')", (teacher_id,))
+        cur.execute("INSERT INTO teachers (user_id, full_name, department, email) VALUES (?, 'Иванов И.А.', 'Кафедра ИТ', 'ivanov@univer.ru')", (teacher_id,))
         
-        # тестовая группа, дисциплина и студента
-        cur.execute("INSERT INTO academic_groups (code, course, faculty) VALUES ('ИВТ-41', 4, 'ФИВТ')")
-        cur.execute("INSERT INTO subjects (title, control_type, semester, hours) VALUES ('Программирование', 'Экзамен', 7, 144)")
-        cur.execute("INSERT INTO students (group_id, record_book_number, full_name, status) VALUES (1, '123456', 'Петров П.П.', 'Обучается')")
+        # тестовые группы (ID: 1, 2, 3, 4)
+        cur.execute("""
+            INSERT INTO academic_groups (code, course, faculty) VALUES 
+            ('ИВТ-41', 4, 'ФИВТ'),
+            ('ИСТ-21', 2, 'ИРИТ'),
+            ('ФТ-11', 1, 'ФизТех'),
+            ('ЭК-31', 3, 'ИРЭУ')
+        """)
         
-        print("Успех: База examtrack.db создана. Тестовые данные добавлены!")
+        # тестовые дисциплины (ID: 1, 2, 3, 4)
+        cur.execute("""
+            INSERT INTO subjects (title, control_type, semester, hours) VALUES 
+            ('Программирование', 'Экзамен', 7, 144),
+            ('Базы данных', 'Зачет', 3, 108),
+            ('Высшая математика', 'Экзамен', 1, 180),
+            ('Экономика', 'Экзамен', 5, 120)
+        """)
+        
+        # тестовые студенты (ID: 1, 2, 3, 4, 5)
+        cur.execute("""
+            INSERT INTO students (group_id, record_book_number, full_name, status) VALUES 
+            (1, '123456', 'Петров П.П.', 'Обучается'),
+            (2, '234567', 'Смирнова А.А.', 'Обучается'),
+            (2, '345678', 'Иванов И.И.', 'Обучается'),
+            (3, '456789', 'Соколова М.М.', 'Обучается'),
+            (4, '567890', 'Козлов К.К.', 'Обучается')
+        """)
+        
+        print("Успех: База examtrack.db создана. Расширенные тестовые данные добавлены!")
     else:
         print("База examtrack.db уже существует и готова к работе.")
 
