@@ -1,13 +1,15 @@
 import sqlite3
 import os
+import hashlib
 
-def create_tables():
+def create_tables_and_seed():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(base_dir, "examtrack.db")
     
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     
+    # Создаем пустые таблицы
     cur.executescript("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,9 +79,28 @@ def create_tables():
         );
     """)
     
+    # Проверяем, есть ли уже пользователи. Если нет — добавляем.
+    cur.execute("SELECT COUNT(*) FROM users")
+    if cur.fetchone()[0] == 0:
+        password_hash = hashlib.sha256('12345'.encode('utf-8')).hexdigest()
+        
+        # администратор и преподавателя
+        cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('admin', ?, 'Администратор')", (password_hash,))
+        cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('teacher', ?, 'Преподаватель')", (password_hash,))
+        teacher_id = cur.lastrowid
+        cur.execute("INSERT INTO teachers (user_id, full_name, department) VALUES (?, 'Иванов И.И.', 'Кафедра ИТ')", (teacher_id,))
+        
+        # тестовая группа, дисциплина и студента
+        cur.execute("INSERT INTO academic_groups (code, course, faculty) VALUES ('ИВТ-41', 4, 'ФИВТ')")
+        cur.execute("INSERT INTO subjects (title, control_type, semester, hours) VALUES ('Программирование', 'Экзамен', 7, 144)")
+        cur.execute("INSERT INTO students (group_id, record_book_number, full_name, status) VALUES (1, '123456', 'Петров П.П.', 'Обучается')")
+        
+        print("Успех: База examtrack.db создана. Тестовые данные добавлены!")
+    else:
+        print("База examtrack.db уже существует и готова к работе.")
+
     conn.commit()
     conn.close()
-    print("База данных examtrack.db и таблицы успешно созданы.")
 
 if __name__ == "__main__":
-    create_tables()
+    create_tables_and_seed()
