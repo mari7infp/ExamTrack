@@ -28,18 +28,21 @@ def authenticate(login: str, password_input: str) -> User:
         
     return user
 
-def create_statement(user: User, group_id: int, subject_id: int, teacher_id: int, exam_date: str):
+def create_statement(user, group_id: int, subject_id: int, teacher_id: int, exam_date: str):
     if user.role != "Администратор":
         raise Exception("Требуются права администратора")
 
     group = group_repo.get_by_id(group_id)
+    if not group:
+        raise Exception(f"Группа с ID {group_id} не существует в базе!")
+
     subject = subject_repo.get_by_id(subject_id)
+    if not subject:
+        raise Exception(f"Дисциплина с ID {subject_id} не существует в базе!")
+
     teacher = teacher_repo.get_by_id(teacher_id)
-    
-    if not group or not subject:
-        raise Exception("Указанная группа или дисциплина не найдены")
     if not teacher:
-        raise Exception("Указанный преподаватель не найден")
+        raise Exception(f"Преподаватель с ID {teacher_id} не существует в базе!")
 
     semester = subject.semester
 
@@ -54,6 +57,7 @@ def create_statement(user: User, group_id: int, subject_id: int, teacher_id: int
     
     student_ids = [s.id for s in active_students]
     result_repo.generate_empty_results(statement_id, student_ids)
+
 
 def set_student_mark(user, statement_id: int, student_id: int, mark_value: str, note: str = None):
     if user.role != "Преподаватель":

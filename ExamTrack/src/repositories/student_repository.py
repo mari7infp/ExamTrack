@@ -11,3 +11,13 @@ class StudentRepository:
             return [Student(*row) for row in rows]
         finally:
             conn.close()
+
+    
+    def get_by_id(self, student_id: int):
+        conn = get_connection()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM students WHERE id = ?", (student_id,))
+            return cur.fetchone()
+        finally:
+            conn.close()
