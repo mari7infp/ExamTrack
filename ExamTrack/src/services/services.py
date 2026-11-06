@@ -55,27 +55,28 @@ def create_statement(user: User, group_id: int, subject_id: int, teacher_id: int
     student_ids = [s.id for s in active_students]
     result_repo.generate_empty_results(statement_id, student_ids)
 
-def set_student_mark(user: User, statement_id: int, student_id: int, mark_value: str):
+def set_student_mark(user, statement_id: int, student_id: int, mark_value: str, note: str = None):
     if user.role != "Преподаватель":
         raise Exception("Действие разрешено только экзаменатору")
-
+        
     statement = statement_repo.get_by_id(statement_id)
     if not statement or statement.status != "Открыта":
         raise Exception("Ведомость заблокирована или не существует")
-
+        
     teacher = teacher_repo.get_by_user_id(user.id)
     if not teacher or statement.teacher_id != teacher.id:
         raise Exception("Вы не являетесь экзаменатором данной ведомости")
-
+        
     valid_marks = ["2", "3", "4", "5", "н/я"]
     mark_str = str(mark_value).strip().lower()
     if mark_str not in valid_marks:
         raise Exception("Недопустимый формат оценки")
-
+        
     mark_int = int(mark_str) if mark_str.isdigit() else None
     current_date = datetime.now().strftime("%Y-%m-%d")
     
-    is_updated = result_repo.update_mark(statement_id, student_id, mark_int, mark_str, current_date)
+    
+    is_updated = result_repo.update_mark(statement_id, student_id, mark_int, mark_str, current_date, note)
     
     if not is_updated:
         raise Exception("Студент с таким ID не числится в данной ведомости")

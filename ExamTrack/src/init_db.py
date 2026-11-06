@@ -88,7 +88,6 @@ def create_tables_and_seed():
         cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('admin', ?, 'Администратор')", (password_hash,))
         cur.execute("INSERT INTO users (login, password_hash, role) VALUES ('teacher', ?, 'Преподаватель')", (password_hash,))
         teacher_id = cur.lastrowid
-        cur.execute("INSERT INTO teachers (user_id, full_name, department) VALUES (?, 'Иванов И.А.', 'Кафедра ИТ')", (teacher_id,))
         cur.execute("INSERT INTO teachers (user_id, full_name, department, email) VALUES (?, 'Иванов И.А.', 'Кафедра ИТ', 'ivanov@univer.ru')", (teacher_id,))
         
         # тестовые группы (ID: 1, 2, 3, 4)

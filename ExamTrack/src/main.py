@@ -64,8 +64,13 @@ def teacher_menu(user):
                 student_id = safe_int_input("ID студента: ")
                 mark = safe_str_input("Оценка (2, 3, 4, 5 или 'н/я'): ")
                 
-                services.set_student_mark(user, statement_id, student_id, mark)
-                print("Успех: Оценка успешно сохранена")
+                # Запрашиваем заметку 
+                note = input("Заметка (необязательно, нажмите Enter для пропуска): ").strip()
+                if not note:
+                    note = None
+                
+                services.set_student_mark(user, statement_id, student_id, mark, note)
+                print("Успех: Оценка и заметка успешно сохранены")
             except Exception as e:
                 print(f"Ошибка бизнес-логики: {e}")
                 
